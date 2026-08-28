@@ -1,48 +1,9 @@
 import streamlit as st
-import random
 import time
+from logic import check_winner, reset_game, bot_move
 
 VERSION = "1.0.0"
 
-
-# ── Funções puras (sem dependência de session_state) ─────────────────────────
-
-def check_winner(board):
-    for row in board:
-        if row[0] == row[1] == row[2] and row[0] != "":
-            return row[0]
-    for col in range(3):
-        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != "":
-            return board[0][col]
-    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != "":
-        return board[0][0]
-    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != "":
-        return board[0][2]
-    if all(cell != "" for row in board for cell in row):
-        return "draw"
-    return None
-
-
-def reset_game(state=None):
-    if state is None:
-        state = st.session_state
-    state.board = [["" for _ in range(3)] for _ in range(3)]
-    state.current_player = "X"
-    state.game_over = False
-    state.winner = None
-    state.board_key += 1
-
-
-def bot_move(board=None):
-    if board is None:
-        board = st.session_state.board
-    empty_cells = [(r, c) for r in range(3) for c in range(3) if board[r][c] == ""]
-    if empty_cells:
-        return random.choice(empty_cells)
-    return None
-
-
-# ── UI Streamlit (só executa quando rodado via `streamlit run`) ───────────────
 
 def handle_click(row, col):
     if st.session_state.game_over or st.session_state.board[row][col] != "":
@@ -90,11 +51,11 @@ def main():
     with col1:
         if st.button("👤 vs 👤", use_container_width=True):
             st.session_state.game_mode = "human"
-            reset_game()
+            reset_game(st.session_state)
     with col2:
         if st.button("👤 vs 🤖", use_container_width=True):
             st.session_state.game_mode = "bot"
-            reset_game()
+            reset_game(st.session_state)
 
     st.divider()
 
@@ -111,9 +72,7 @@ def main():
 
     st.subheader("Tabuleiro")
 
-    # Container para o tabuleiro
     board_container = st.container()
-
     with board_container:
         for row in range(3):
             cols = st.columns(3)
@@ -136,9 +95,9 @@ def main():
         st.info("🤖 Bot pensando...")
         time.sleep(0.5)
 
-        row, col = bot_move()
-        if row is not None:
-            handle_click(row, col)
+        move = bot_move(st.session_state.board)
+        if move is not None:
+            handle_click(*move)
             st.session_state.board_key += 1
             st.rerun()
 
@@ -150,14 +109,11 @@ def main():
             st.success(f"🏆 Jogador {st.session_state.winner} venceu! 🤷‍♂️")
 
         if st.button("🔄 Jogar Novamente", use_container_width=True):
-            reset_game()
+            reset_game(st.session_state)
 
     st.divider()
     if not st.session_state.game_over:
         st.info(f"🎯 Vez do jogador: **{st.session_state.current_player}**")
 
 
-from streamlit.runtime.scriptrunner import get_script_run_ctx
-
-if get_script_run_ctx() is not None:
-    main()
+main()

@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app import check_winner, bot_move, reset_game
+from logic import check_winner, bot_move, reset_game
 
 
 def test_check_winner_horizontal_x():
