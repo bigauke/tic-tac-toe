@@ -157,4 +157,7 @@ def main():
         st.info(f"🎯 Vez do jogador: **{st.session_state.current_player}**")
 
 
-main()
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+
+if get_script_run_ctx() is not None:
+    main()
