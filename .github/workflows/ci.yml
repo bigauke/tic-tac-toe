@@ -25,4 +25,26 @@ jobs:
             - name: Executar testes
               run: python -m pytest tests/test_app.py
             
-    
+    build-and-push:
+        name: CD - Build e push da imagem Docker
+        runs-on: ubuntu-latest
+        needs: test                                   # só roda se o job "test" passar
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        # a condição acima garante que Pull Requests NUNCA publicam imagem —
+        # só um push direto na main dispara a publicação no Docker Hub
+        steps:
+            - name: Checkout do código
+              uses: actions/checkout@v4
+
+            - name: Login no Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKERHUB_USERNAME }}   # lidos dos Secrets do repo,
+                password: ${{ secrets.DOCKERHUB_TOKEN }}       # nunca do código-fonte
+
+            - name: Build e push da imagem
+              uses: docker/build-push-action@v6
+              with:
+                context: .
+                push: true
+                tags: ${{ secrets.DOCKERHUB_USERNAME }}/tic-tac-toe:latest
