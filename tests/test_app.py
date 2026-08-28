@@ -1,8 +1,7 @@
 import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+sys.path.insert(0, '/mnt/c/Projects/ppi/tic-tac-toe')
 
-from logic import check_winner, bot_move, reset_game
+from app import check_winner, bot_move, reset_game
 
 
 def test_check_winner_horizontal_x():
