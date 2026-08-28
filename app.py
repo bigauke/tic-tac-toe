@@ -136,7 +136,7 @@ if st.session_state.game_over:
     if st.session_state.winner == "draw":
         st.warning("🤝 Empate!")
     else:
-        st.success(f"🏆 Jogador {st.session_state.winner} venceu!")
+        st.success(f"🏆 Jogador {st.session_state.winner} venceu! 🤷‍♂️")
     
     if st.button("🔄 Jogar Novamente", use_container_width=True):
         reset_game()
